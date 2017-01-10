@@ -22,9 +22,10 @@ Not described yet, just clone the repo wherever you want.
 If you just want to test the lib, without installing JNA in your classpath, you may also copy the jar file into the vigraj dir and run the following commands:
 
 To build the lib:
-	javac -classpath .:jna.jar -g *.java
+> javac -classpath .:jna.jar -g *.java
+ 
 And then, to run the examples	
-	java -classpath .:jna.jar Examples
+> java -classpath .:jna.jar Examples
 
 
 3. Auto-build of the c-wrapper
