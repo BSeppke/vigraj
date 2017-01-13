@@ -12,6 +12,7 @@ public class ImgProc
  		int	vigra_affinewarpimage_c ( Pointer arr_in,  Pointer affineMatrix,  Pointer arr_out,  int width,  int height,  int resample_method);
  		int	vigra_reflectimage_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  int reflect_method);
  		int	vigra_fouriertransform_c ( Pointer arr_in,  Pointer arr_real_out,  Pointer arr_imag_out,  int width,  int height);
+ 		int	vigra_fouriertransforminverse_c ( Pointer arr_real_in,  Pointer arr_imag_in,  Pointer arr_real_out,  Pointer arr_imag_out,  int width,  int height);
  		int vigra_fastcrosscorrelation_c ( Pointer arr_in,  Pointer arr_template_in,  Pointer arr_out,  int width,  int height,  int template_width,  int template_height);
  		int	vigra_fastnormalizedcrosscorrelation_c ( Pointer arr_in,  Pointer arr_template_in,  Pointer arr_out,  int width,  int height,  int template_width,  int template_height);
  		int vigra_localmaxima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity);
@@ -96,6 +97,29 @@ public class ImgProc
             if(CLibrary.INSTANCE.vigra_fouriertransform_c(img.getBand(b), img_real_out.getBand(b), img_imag_out.getBand(b), img.getWidth(), img.getHeight()) != 0)
             {
                 throw new Exception("vigra_fouriertransform_c failed!");
+            }
+        }
+        ArrayList<Image> result = new ArrayList<Image>();
+            result.add(img_real_out);
+            result.add(img_imag_out);
+        return result;
+	}
+    
+    public static ArrayList<Image> fourierTransformInverse(ArrayList<Image> fft_img) throws Exception
+    {
+        Image img_real_in = fft_img.get(0);
+        Image img_imag_in = fft_img.get(1);
+        
+    	int numBands = real_img.getNumBands();
+
+        Image img_real_out = new Image(img_real_in.getWidth(), img_real_in.getHeight(), numBands);
+        Image img_imag_out = new Image(img_real_in.getWidth(), img_real_in.getHeight(), numBands);
+    
+        for(int b=0; b<numBands; b++)
+        {
+            if(CLibrary.INSTANCE.vigra_fouriertransforminverse_c(img_real_in.getBand(b), img_imag_in.getBand(b), img_real_out.getBand(b), img_imag_out.getBand(b), img.getWidth(), img.getHeight()) != 0)
+            {
+                throw new Exception("vigra_fouriertransforminverse_c failed!");
             }
         }
         ArrayList<Image> result = new ArrayList<Image>();
