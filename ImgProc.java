@@ -110,14 +110,14 @@ public class ImgProc
         Image img_real_in = fft_img.get(0);
         Image img_imag_in = fft_img.get(1);
         
-    	int numBands = real_img.getNumBands();
+    	int numBands = img_real_in.getNumBands();
 
         Image img_real_out = new Image(img_real_in.getWidth(), img_real_in.getHeight(), numBands);
         Image img_imag_out = new Image(img_real_in.getWidth(), img_real_in.getHeight(), numBands);
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_fouriertransforminverse_c(img_real_in.getBand(b), img_imag_in.getBand(b), img_real_out.getBand(b), img_imag_out.getBand(b), img.getWidth(), img.getHeight()) != 0)
+            if(CLibrary.INSTANCE.vigra_fouriertransforminverse_c(img_real_in.getBand(b), img_imag_in.getBand(b), img_real_out.getBand(b), img_imag_out.getBand(b), img_real_in.getWidth(), img_real_in.getHeight()) != 0)
             {
                 throw new Exception("vigra_fouriertransforminverse_c failed!");
             }
