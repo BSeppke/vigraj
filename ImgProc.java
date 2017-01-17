@@ -244,11 +244,11 @@ public class ImgProc
             throw new Exception("vigra_paddimage_c failed:  left, right, upper, lower must be positive!");
         }
         
-    	Image img_out = new Image(img.getWidth()+left+right, img.getHeight()+upper+lower, numBands);
+    	Image img_out = new Image(width+left+right, height+upper+lower, numBands);
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_paddimage_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), left, upper, right, lower) != 0)
+            if(CLibrary.INSTANCE.vigra_paddimage_c(img.getBand(b), img_out.getBand(b), width, height, left, upper, right, lower) != 0)
             {
                 throw new Exception("vigra_paddimage_c failed!");
             }

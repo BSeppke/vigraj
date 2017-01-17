@@ -19,8 +19,6 @@ public class Image
     	m_height = height;
     	m_bands = new ArrayList<FloatArray>();
     	
-    	int imgsize = width*height;
-    	
         for (int b=0; b<numBands; b++)
         {
     		FloatArray arr = new FloatArray(width,height);

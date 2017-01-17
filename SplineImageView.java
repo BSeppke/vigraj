@@ -1,4 +1,3 @@
-import com.sun.jna.*; 
 import java.util.*;
 
 public class SplineImageView

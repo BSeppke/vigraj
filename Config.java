@@ -1,7 +1,7 @@
 import com.sun.jna.*; 
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Locale;
 
 public class Config 
@@ -140,13 +140,27 @@ public class Config
 		if(os == "windows")
 		{
 			//copy files
-			String build_cmd = "cd " + libDir() + "vigra_c && cp bin/win" + getOSBits() + "/*.dll ..";
-			
 			System.out.print("Copying vigra_c files under Windows\n");
-			
-			StringBuilder build_str = new StringBuilder();
-			int build_res = runShellCommand(build_cmd, build_str);
-			return (build_res == 0);
+			try
+			{
+				String[] filenames = {	"vigra_c.dll",
+										"vigraimpex.dll",
+										"fftw-3.3.dll",
+										"fftwf-3.3.dll"};
+				for(int i=0; i!=filenames.length; i++)
+				{	
+					Files.copy( Paths.get(libDir() + "vigra_c/bin/win" + getOSBits() + "/" + filenames[i]),
+								Paths.get(libDir() +  filenames[i]),
+								StandardCopyOption.REPLACE_EXISTING);
+				}
+				return true;
+			}
+			catch(Exception ex)
+			{
+				System.out.print("Something went wrong: ");
+				System.out.println(ex.toString());
+				return false;				
+			}
 		}
 		if(os == "macos" || os == "linux")
 		{
