@@ -13,9 +13,11 @@ public class Impex
         
         int vigra_importgrayimage_c(Pointer p, int width, int height, String filename);
         int vigra_importrgbimage_c(Pointer p_r, Pointer p_g, Pointer p_b, int width, int height, String filename);
-        
+        int vigra_importrgbaimage_c(Pointer p_r, Pointer p_g, Pointer p_b, Pointer p_a, int width, int height, String filename);
+
         int vigra_exportgrayimage_c(Pointer p, int width, int height, String filename);
         int vigra_exportrgbimage_c(Pointer p_r, Pointer p_g, Pointer p_b, int width, int height, String filename);
+        int vigra_exportrgbaimage_c(Pointer p_r, Pointer p_g, Pointer p_b, Pointer p_a, int width, int height, String filename);
     }
     
     public static Image importImage(String filename) throws IOException
@@ -53,9 +55,22 @@ public class Impex
         			throw new IOException("RGB image could not be loaded from filesystem, although w,h and numBands were read!");
     	    	}
         	}
+        	else if(numbands == 4)
+        	{
+            	Image img = new Image(width, height, numbands);
+        	
+                if(CLibrary.INSTANCE.vigra_importrgbaimage_c(img.getBand(0), img.getBand(1), img.getBand(2), img.getBand(3), width, height, filename) == 0)
+				{
+				    return img;
+    			}
+    	    	else
+    	    	{
+        			throw new IOException("RGBA image could not be loaded from filesystem, although w,h and numBands were read!");
+    	    	}
+        	}
         	else
         	{
-        		throw new IOException("Image could not be loaded from filesystem, since numBands were not 1 or 3!");
+        		throw new IOException("Image could not be loaded from filesystem, since numBands were not 1, 3 or 4!");
         	}
         }
         else
@@ -86,9 +101,16 @@ public class Impex
 				   throw new IOException("RGB image export failed!");
     	    	}
         	}
+        	else if(numbands == 3)
+        	{
+                if(CLibrary.INSTANCE.vigra_exportrgbaimage_c(img.getBand(0), img.getBand(1), img.getBand(2), img.getBand(3), width, height, filename) != 0)
+				{
+				   throw new IOException("RGBA image export failed!");
+    	    	}
+        	}
         	else
         	{
-        		throw new IOException("Only images with numBands of 1 or 3 can be exported!");
+        		throw new IOException("Only images with numBands of 1, 3 or 4 can be exported!");
         	}
         }
         else
