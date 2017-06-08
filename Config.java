@@ -1,11 +1,11 @@
-import com.sun.jna.*; 
+import com.sun.jna.*;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.Locale;
 
 public class Config 
-{
+{	
 	public static int runShellCommand(String command, StringBuilder result_str)
 	{
 		int result = 1;
@@ -24,7 +24,6 @@ public class Config
 			{
 	  			result_str.append(line + "\n");
 			}
-			
 			b.close();
 		}
 		catch(IOException ex)
@@ -122,10 +121,35 @@ public class Config
 		}
 		return false;
 	}  
+	
+    public interface CLibrary extends Library 
+    {
+        
+        int vigra_imagewidth_c(String filename);
+        int vigra_imageheight_c(String filename);
+        int vigra_imagenumbands_c(String filename);
+        
+        int vigra_importgrayimage_c(Pointer p, int width, int height, String filename);
+        int vigra_importrgbimage_c(Pointer p_r, Pointer p_g, Pointer p_b, int width, int height, String filename);
+        int vigra_importrgbaimage_c(Pointer p_r, Pointer p_g, Pointer p_b, Pointer p_a, int width, int height, String filename);
+
+        int vigra_exportgrayimage_c(Pointer p, int width, int height, String filename);
+        int vigra_exportrgbimage_c(Pointer p_r, Pointer p_g, Pointer p_b, int width, int height, String filename);
+        int vigra_exportrgbaimage_c(Pointer p_r, Pointer p_g, Pointer p_b, Pointer p_a, int width, int height, String filename);
+    }
+    
+    
 	public static boolean isVigraCInstalled()
 	{
-		File f = new File(libFileName(true));
-		return (f.exists() && !f.isDirectory());
+		try
+		{
+			Native.loadLibrary("vigra_c", CLibrary.class);
+			return true;
+		}
+		catch(Error err)
+		{
+		}
+		return false;
 	}
 	
 	public static boolean checkInstallVigraC()
@@ -162,7 +186,7 @@ public class Config
 				return false;				
 			}
 		}
-		if(os == "macos" || os == "linux")
+		else if(os == "macos" || os == "linux")
 		{
 			//build and then copy result into dir
 			if(isVigraInstalled())
@@ -185,6 +209,14 @@ public class Config
 				
 				return (build_res == 0);
 			}
+			else
+			{
+				System.out.println("Did not find vigra-config script. Please install vigra >=1.11.0 first!");
+			}
+		}
+		else
+		{
+			System.out.println("Sorry, operating system: " + os + " is not supported");
 		}
 		return false;
 	}

@@ -30,7 +30,7 @@ public class Examples
 					}
 					System.out.println("");
 				}
-			
+			 
 				Impex.exportImage(Filters.gaussianSmoothing(ImgProc.resizeImage(ImgProc.rotateImage(ImgProc.reflectImage(img, 1), 30, 2), (int)(img.getWidth()*1.1), (int)(img.getHeight()*1.1), 2), 2.0f), Config.libDir() +"/images/bla.png");
 			}
 			catch(Exception ex)
