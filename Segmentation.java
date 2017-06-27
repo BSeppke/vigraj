@@ -218,7 +218,7 @@ public class Segmentation
         
         if(img_numBands==3 && labels_numBands==1) //Special handling for (none-bandwise) RGB case
         {
-            Image img_out = new Image(19, max_label+1, 1);
+            Image img_out = new Image(25, max_label+1, 1);
             
             if(CLibrary.INSTANCE.vigra_extractfeatures_rgb_c(img.getBand(0), img.getBand(1), img.getBand(2), labels.getBand(0), img_out.getBand(0), img.getWidth(), img.getHeight(), max_label) != 0)
             {
@@ -229,7 +229,7 @@ public class Segmentation
         }
         else if(img_numBands==labels_numBands)
         {
-            Image img_out = new Image(11, max_label+1, img_numBands);
+            Image img_out = new Image(17, max_label+1, img_numBands);
             
             for(int b=0; b<img_numBands; b++)
             {
