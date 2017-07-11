@@ -8,23 +8,45 @@ public class Config
 {	
 	public static int runShellCommand(String command, StringBuilder result_str)
 	{
+		String[] commands = {"/bin/bash", "-c", command};
+		
+		//Assume MacPorts installation in default path for macOS:
+		if(getOS() == "macos")
+		{
+			commands[2] = "export PATH=/opt/local/bin:$PATH && " + commands[2];
+		}
 		int result = 1;
 		
 		try
 		{
 			Runtime r = Runtime.getRuntime();
-			String[] commands = {"/bin/bash", "-c", command};
 			Process p = r.exec(commands);
-			result = p.waitFor();
+			p.waitFor();
+			result = p.exitValue();
 			
-			BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				
-			String line = "";
-			while ((line = b.readLine()) != null) 
+			if(result == 0)
 			{
-	  			result_str.append(line + "\n");
+				BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				
+				String line = "";
+				while ((line = b.readLine()) != null) 
+				{
+		  			result_str.append(line + "\n");
+				}
+				b.close();
 			}
-			b.close();
+			else
+			{
+				BufferedReader b = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		
+				String line = "";
+				StringBuilder error_str = new StringBuilder();
+				if ((line = b.readLine()) != null) 
+				{
+					error_str.append(line + "\n");
+				}
+				throw new IOException(error_str.toString());				
+			}
 		}
 		catch(IOException ex)
 		{
@@ -191,21 +213,21 @@ public class Config
 			//build and then copy result into dir
 			if(isVigraInstalled())
 			{
-				System.out.print("Linux/Mac build of vigra_c:\n    vigra is already installed!\n");
+				System.out.println("Linux/Mac build of vigra_c: vigra is already installed!\n");
 				
 				String[] build_cmds = { "mkdir -p vigra_c/build",
-										"cd vigra_c/build && cmake .. && make",
+										"cd vigra_c/build && cmake ..",
+										"cd vigra_c/build && make",
 										"cp vigra_c/bin/" + libFileName() + " .",
 										"rm -r -f vigra_c/build"};
-				StringBuilder build_str = new StringBuilder();
 				int build_res = 0;
 				for(int i=0; i!= build_cmds.length; i++)
 				{
+					StringBuilder build_str = new StringBuilder();
 					build_res = build_res + runShellCommand(build_cmds[i], build_str);
-					System.out.println("Executing: " + build_cmds[i] + "\n");
-					System.out.println("Result [" + build_res + "]: " + build_str + "\n");
+					System.out.println("Executing: " + build_cmds[i]);
+					System.out.println("Result = " + build_res + ":\n" + build_str);
 				}
-				System.out.print("Build finished with:\n    '"+ build_str + "'\n");
 				
 				return (build_res == 0);
 			}
