@@ -215,11 +215,8 @@ public class Config
 			{
 				System.out.println("Linux/Mac build of vigra_c: vigra is already installed!\n");
 				
-				String[] build_cmds = { "mkdir -p vigra_c/build",
-										"cd vigra_c/build && cmake ..",
-										"cd vigra_c/build && make",
-										"cp vigra_c/bin/" + libFileName() + " .",
-										"rm -r -f vigra_c/build"};
+				String[] build_cmds = { "cd vigra_c && ./build-" + getOSBits() + ".sh",
+										"cp vigra_c/bin/" + libFileName() + " ."};
 				int build_res = 0;
 				for(int i=0; i!= build_cmds.length; i++)
 				{
