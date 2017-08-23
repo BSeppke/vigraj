@@ -7,8 +7,8 @@ public class Filters
     {
         CLibrary INSTANCE = (CLibrary) Native.loadLibrary("vigra_c", CLibrary.class);
         
-        int vigra_convolveimage_c ( FloatArray arr_in,  DoubleArray kernel_arr_in,  FloatArray arr_out,  int width,  int height,  int kernel_width,  int kernel_height);
-        int vigra_separableconvolveimage_c ( FloatArray arr_in,  DoubleArray kernel_h_arr_in,  DoubleArray kernel_v_arr_in,  FloatArray arr_out,  int width,  int height,  int kernel_width,  int kernel_height);
+        int vigra_convolveimage_c ( FloatArray arr_in,  DoubleArray kernel_arr_in,  FloatArray arr_out,  int width,  int height,  int kernel_width,  int kernel_height, int border_treatment);
+        int vigra_separableconvolveimage_c ( FloatArray arr_in,  DoubleArray kernel_h_arr_in,  DoubleArray kernel_v_arr_in,  FloatArray arr_out,  int width,  int height,  int kernel_width,  int kernel_height, int border_treatment);
         int vigra_gaussiangradient_c ( FloatArray arr_in,  FloatArray arr_gx_out,  FloatArray arr_gy_out,  int width,  int height,  float sigma);
         int vigra_gaussiangradientmagnitude_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float sigma);
         int vigra_gaussiansmoothing_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float sigma);
@@ -21,7 +21,7 @@ public class Filters
         int vigra_shockfilter_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float sigma,  float rho,  float upwind_factor_h,  int iterations);
  	}
     
-    public static Image colvolveImage(Image img, DoubleArray kernel) throws Exception
+    public static Image colvolveImage(Image img, DoubleArray kernel, int border_treatment) throws Exception
     {
     	int numBands = img.getNumBands();
     	
@@ -29,15 +29,19 @@ public class Filters
     	
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_convolveimage_c(img.getBand(b), kernel, img_out.getBand(b), img.getWidth(), img.getHeight(), kernel.getWidth(), kernel.getHeight()) != 0)
+            if(CLibrary.INSTANCE.vigra_convolveimage_c(img.getBand(b), kernel, img_out.getBand(b), img.getWidth(), img.getHeight(), kernel.getWidth(), kernel.getHeight(), border_treatment) != 0)
             {
                 throw new Exception("vigra_convolveimage_c failed!");
             }
         }
         return img_out;
 	}
-	
-    public static Image separableColvolveImage(Image img, DoubleArray kernel_h,  DoubleArray kernel_v) throws Exception
+    public static Image colvolveImage(Image img, DoubleArray kernel) throws Exception
+    {
+    	return colvolveImage(img, kernel, 3); //REFLECT MODE by default
+    }
+    
+    public static Image separableColvolveImage(Image img, DoubleArray kernel_h,  DoubleArray kernel_v, int border_treatment) throws Exception
     {
     	int numBands = img.getNumBands();
     	
@@ -45,12 +49,16 @@ public class Filters
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_separableconvolveimage_c(img.getBand(b), kernel_h, kernel_v, img_out.getBand(b), img.getWidth(), img.getHeight(), kernel_h.getWidth(), kernel_v.getHeight()) != 0)
+            if(CLibrary.INSTANCE.vigra_separableconvolveimage_c(img.getBand(b), kernel_h, kernel_v, img_out.getBand(b), img.getWidth(), img.getHeight(), kernel_h.getWidth(), kernel_v.getHeight(), border_treatment) != 0)
             {
                 throw new Exception("vigra_separableconvolveimage_c failed!");
             }
         }
         return img_out;
+    }
+    public static Image separableColvolveImage(Image img, DoubleArray kernel_h,  DoubleArray kernel_v) throws Exception
+    {
+    	return separableColvolveImage(img, kernel_h, kernel_v, 3); //REFLECT MODE by default
     }
 
     public static ArrayList<Image> gaussianGradient(Image img, float sigma) throws Exception
