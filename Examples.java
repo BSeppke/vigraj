@@ -30,8 +30,20 @@ public class Examples
 					}
 					System.out.println("");
 				}
-			 
-				Impex.exportImage(Filters.gaussianSmoothing(ImgProc.resizeImage(ImgProc.rotateImage(ImgProc.reflectImage(img, 1), 30, 2), (int)(img.getWidth()*1.1), (int)(img.getHeight()*1.1), 2), 2.0f), Config.libDir() +"/images/bla.png");
+				
+				float[] red = {255, 0, 0};
+				
+				Impex.exportImage(
+					ImgProc.paddImage(
+						Filters.gaussianSmoothing(
+							ImgProc.resizeImage(
+								ImgProc.rotateImage(
+									ImgProc.reflectImage(img, 1),
+									30, 2),
+								(int)(img.getWidth()*1.1), (int)(img.getHeight()*1.1), 2),
+							2.0f),
+						10, 20, 30, 40, red),
+					Config.libDir() +"/images/bla.png");
 			}
 			catch(Exception ex)
 			{
