@@ -18,7 +18,7 @@ public class ImgProc
  		int vigra_localmaxima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity);
  		int	vigra_localminima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity);
  		int	vigra_subimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  int left,  int upper,  int right,  int lower);
- 		int vigra_paddimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  int left,  int upper,  int right,  int lower, float value);
+ 		int vigra_paddimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  int left,  int upper,  int right,  int lower);
  	}
     
     public static Image resizeImage(Image img, int new_width, int new_height, int resample_method) throws Exception
@@ -244,11 +244,11 @@ public class ImgProc
             throw new Exception("vigra_paddimage_c failed:  left, right, upper, lower must be positive!");
         }
         
-    	Image img_out = new Image(width+left+right, height+upper+lower, numBands);
+    	Image img_out = new Image(width+left+right, height+upper+lower, numBands, value);
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_paddimage_c(img.getBand(b), img_out.getBand(b), width, height, left, upper, right, lower, value[b]) != 0)
+            if(CLibrary.INSTANCE.vigra_paddimage_c(img.getBand(b), img_out.getBand(b), width, height, left, upper, right, lower) != 0)
             {
                 throw new Exception("vigra_paddimage_c failed!");
             }

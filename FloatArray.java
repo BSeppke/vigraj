@@ -10,16 +10,25 @@ public class FloatArray
     
     public FloatArray(int size)
     {
-    	this(size,1);
+    	this(size, 1, 0);
     }
     
     
-    public FloatArray(int width, int height)
+    public FloatArray(int width, int height, float value)
     {
     	super(width*height*Native.getNativeSize(Float.TYPE));
+    	
+    	int float_size   = Native.getNativeSize(Float.TYPE);
+    	long memory_size = width*height*float_size;
         
         m_width  = width;
         m_height = height;
+        
+        //Initialize the array with value
+        for(long l=0; l<memory_size; l+=float_size)
+        {
+        	this.setFloat(l, value);
+        }
     }
     
     public FloatArray(float[] flat_array, int width, int height)
