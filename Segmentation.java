@@ -210,7 +210,50 @@ public class Segmentation
         }
         return img_out;
     }
-    
+    	/* The following features will be extracted for each region of an RGB image:
+    	 * 
+    	 *  | Index         | Feature                              |
+    	 *  | ------------- | ------------------------------------ |
+    	 *  |  0            | region_size                          |
+    	 *  |  1,  2        | upperleft-x and y-coord              |
+    	 *  |  3,  4        | lowerright-x and y-coord             |
+    	 *  |  5,  6        | mean-x and y-coord                   |
+    	 *  |  7,  8,  9    | min red,green,blue value             |
+    	 *  | 10, 11, 12    | max red,green,blue value             |
+    	 *  | 13, 14, 15    | mean red,green,blue value            |
+    	 *  | 16, 17, 18    | std.dev. red,green,blue value        |
+    	 *  | 19, 20        | major ev: x and y-coord              |
+    	 *  | 21, 22        | minor ev: x and y-coord              |
+    	 *  | 23            | major ew                             |
+    	 *  | 24            | minor ew                             |
+    	 *  | 25, 26        | luminace weighted mean-x and y-coord |
+    	 *  |               | L = 0.3*R + 0.59*G + 0.11*B          |
+    	 *  | 27            | perimeter (region contour length)    |
+    	 *  | 28, 29, 30    | skewness (red, green, blue)          |
+    	 *  | 31, 32, 33    | kurtosis (red, green, blue)          |
+    	 *  
+    	 *  
+    	 *  For any other band-count, a band-wise statistic will be created using:
+		 * 
+		 *  | Index         | Feature                                |
+		 *  | ------------- | -------------------------------------- |
+		 *  |  0            | region_size                            |
+		 *  |  1,  2        | upperleft-x and y-coord                |
+		 *  |  3,  4        | lowerright-x and y-coord               |
+		 *  |  5,  6        | mean-x and y-coord                     |
+		 *  |  7            | min grey value                         |
+		 *  |  8            | max grey value                         |
+		 *  |  9            | mean grey value                        |
+		 *  | 10            | std.dev. grey value                    |
+		 *  | 11, 12        | major ev: x and y-coord                |
+		 *  | 13, 14        | minor ev: x and y-coord                |
+		 *  | 15            | major ew                               |
+		 *  | 16            | minor ew                               |
+		 *  | 17, 18        | grey value weighted mean-x and y-coord |
+		 *  | 19            | perimeter (region contour length)      |
+		 *  | 20            | skewness                               |
+		 *  | 21            | kurtosis                               |
+    	 */
     public static Image extractFeatures(Image img, Image labels, int max_label) throws Exception
     {
     	int img_numBands = img.getNumBands();
@@ -218,7 +261,7 @@ public class Segmentation
         
         if(img_numBands==3 && labels_numBands==1) //Special handling for (none-bandwise) RGB case
         {
-            Image img_out = new Image(25, max_label+1, 1);
+            Image img_out = new Image(34, max_label+1, 1);
             
             if(CLibrary.INSTANCE.vigra_extractfeatures_rgb_c(img.getBand(0), img.getBand(1), img.getBand(2), labels.getBand(0), img_out.getBand(0), img.getWidth(), img.getHeight(), max_label) != 0)
             {
@@ -229,7 +272,7 @@ public class Segmentation
         }
         else if(img_numBands==labels_numBands)
         {
-            Image img_out = new Image(17, max_label+1, img_numBands);
+            Image img_out = new Image(22, max_label+1, img_numBands);
             
             for(int b=0; b<img_numBands; b++)
             {
