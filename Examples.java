@@ -33,15 +33,16 @@ public class Examples
 				
 				float[] red = {300, 0, 0};
 				
-				Image img2 = ImgProc.paddImage(
-						Filters.gaussianSmoothing(
-								ImgProc.resizeImage(
-									ImgProc.rotateImage(
-										ImgProc.reflectImage(img, 1),
-										30, 2),
-									(int)(img.getWidth()*1.1), (int)(img.getHeight()*1.1), 2),
-								2.0f),
-							10, 20, 30, 40, red);
+				Image img2 = ImgProc.clipImage(ImgProc.paddImage(
+								Filters.gaussianSmoothing(
+										ImgProc.resizeImage(
+												ImgProc.rotateImage(
+														ImgProc.reflectImage(img, 1),
+														30, 2),
+												(int)(img.getWidth()*1.1), (int)(img.getHeight()*1.1), 2),
+										2.0f),
+									10, 20, 30, 40, red),
+								0, 255);
 
 				Impex.exportImage(img2, Config.libDir() +"/images/bla-rescaled.png");
 				Impex.exportImage(img2, Config.libDir() +"/images/bla-clipped.png", false); //Use clipping 0..255 instead of rescaling
