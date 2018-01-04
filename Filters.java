@@ -16,9 +16,10 @@ public class Filters
         int vigra_hessianmatrixofgaussian_c ( FloatArray arr_in,  FloatArray arr_xx_out,  FloatArray arr_xy_out,  FloatArray arr_yy_out,  int width,  int height,  float scale);
         int vigra_gaussiansharpening_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float sharpening_factor,  float scale);
         int vigra_simplesharpening_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height, float sharpening_factor);
-        int vigra_medianfilter_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  int window_width,  int window_height);
+        int vigra_medianfilter_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  int window_width,  int window_height, int border_treatment);
         int vigra_nonlineardiffusion_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float edge_threshold,  float scale);
         int vigra_shockfilter_c ( FloatArray arr_in,  FloatArray arr_out,  int width,  int height,  float sigma,  float rho,  float upwind_factor_h,  int iterations);
+        int vigra_nonlocalmean_c ( FloatArray arr_in, FloatArray arr_out, int width, int height, int policy_type, float sigma, float mean, float varRatio, float epsilon, float sigmaSpatial, int searchRadius, int patchRadius, float sigmaMean, int stepSize, int iterations, int nThreads, boolean verbose);
  	}
     
     public static Image colvolveImage(Image img, DoubleArray kernel, int border_treatment) throws Exception
@@ -183,7 +184,7 @@ public class Filters
         return img_out;
     }
 	
-    public static Image medianFilter(Image img, int filter_width, int filter_height) throws Exception
+    public static Image medianFilter(Image img, int filter_width, int filter_height, int border_treatment) throws Exception
     {
     	int numBands = img.getNumBands();
 
@@ -191,12 +192,16 @@ public class Filters
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_medianfilter_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), filter_width, filter_height) != 0)
+            if(CLibrary.INSTANCE.vigra_medianfilter_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), filter_width, filter_height, border_treatment) != 0)
             {
                 throw new Exception("vigra_medianfilter_c failed!");
             }
         }
         return img_out;
+    }
+    public static Image medianFilter(Image img, int filter_width, int filter_height) throws Exception
+    {
+    	return medianFilter(img, filter_width, filter_height, 5); //ZERO PADDING MODE by default
     }
     	
     public static Image nonlinearDiffusion(Image img, float edge_threshold, float sigma) throws Exception
@@ -229,5 +234,38 @@ public class Filters
             }
         }
         return img_out;
+    }
+    
+    public static Image nonLocalMean(Image img, int policy_type, float sigma, float mean, float varRatio, float epsilon, float sigmaSpatial, int searchRadius, int patchRadius, float sigmaMean, int stepSize, int iterations, int nThreads, boolean verbose)  throws Exception
+    {
+    	int numBands = img.getNumBands();
+    	
+        Image img_out = new Image(img.getWidth(), img.getHeight(), numBands);
+    
+        for(int b=0; b<numBands; b++)
+        {
+            if(CLibrary.INSTANCE.vigra_nonlocalmean_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), policy_type, sigma, mean, varRatio, epsilon, sigmaSpatial, searchRadius, patchRadius, sigmaMean, stepSize, iterations, nThreads, verbose) != 0)
+            {
+                throw new Exception("vigra_nonlocalmean_c failed!");
+            }
+        }
+        return img_out;    	
+    }
+    
+    //Call with default args:
+    public static Image nonLocalMean(Image img, int policy_type) throws Exception
+    {
+    	if(policy_type == 0)
+    	{
+    		return nonLocalMean(img, 0, 10.0f, 0.95f, 0.5f, 0.00001f, 2.0f, 5, 2, 10.0f, 2, 2, 8, true);
+    	}
+    	else if(policy_type == 1)
+    	{
+    		return nonLocalMean(img, 1, 50.0f, 5.0f, 0.5f, 0.00001f, 2.0f, 5, 2, 10.0f, 2, 2, 8, true);    		
+    	}
+    	else
+    	{
+    		throw new Exception("nonlocalMean: Policy must be either 0 or 1!");
+    	}
     }
 }
