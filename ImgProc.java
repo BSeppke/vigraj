@@ -15,8 +15,8 @@ public class ImgProc
  		int	vigra_fouriertransforminverse_c ( Pointer arr_real_in,  Pointer arr_imag_in,  Pointer arr_real_out,  Pointer arr_imag_out,  int width,  int height);
  		int vigra_fastcrosscorrelation_c ( Pointer arr_in,  Pointer arr_template_in,  Pointer arr_out,  int width,  int height,  int template_width,  int template_height);
  		int	vigra_fastnormalizedcrosscorrelation_c ( Pointer arr_in,  Pointer arr_template_in,  Pointer arr_out,  int width,  int height,  int template_width,  int template_height);
- 		int vigra_localmaxima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity);
- 		int	vigra_localminima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity);
+ 		int vigra_localmaxima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus, float plateau_epsilon);
+ 		int	vigra_localminima_c ( Pointer arr_in,  Pointer arr_out,  int width,  int height,  boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus, float plateau_epsilon);
  		int	vigra_subimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  int left,  int upper,  int right,  int lower);
  		int vigra_paddimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  int left,  int upper,  int right,  int lower);
  		int vigra_clipimage_c ( Pointer arr_in,  Pointer arr_out,  int width_in,  int height_in,  float low, float upp);
@@ -162,7 +162,7 @@ public class ImgProc
         return img_out;
 	}
 	
-    public static Image localMinima(Image img, boolean eight_connectivity) throws Exception
+    public static Image localMinima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus, float plateau_epsilon) throws Exception
     {
     	int numBands = img.getNumBands();
 
@@ -170,19 +170,39 @@ public class ImgProc
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_localminima_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), eight_connectivity) != 0)
+            if(CLibrary.INSTANCE.vigra_localminima_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon) != 0)
             {
                 throw new Exception("vigra_localminima_c failed!");
             }
         }
         return img_out;
 	}
+    public static Image localMinima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus) throws Exception
+    {
+    	return localMinima(img, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, 0.001f);
+    }
+    public static Image localMinima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border) throws Exception
+    {
+    	return localMinima(img, eight_connectivity, marker, threshold, allow_at_border, false, 0.001f);
+    }
+    public static Image localMinima(Image img, boolean eight_connectivity, float marker, float threshold) throws Exception
+    {
+    	return localMinima(img, eight_connectivity, marker, threshold, false, false, 0.001f);
+    }
+    public static Image localMinima(Image img, boolean eight_connectivity, float marker) throws Exception
+    {
+    	return localMinima(img, eight_connectivity, marker, Float.MAX_VALUE, false, false, 0.001f);
+    }
+    public static Image localMinima(Image img, boolean eight_connectivity) throws Exception
+    {
+    	return localMinima(img, eight_connectivity, 1.0f, Float.MAX_VALUE, false, false, 0.001f);
+    }
     public static Image localMinima(Image img) throws Exception
     {
-        return localMinima(img, true);
+        return localMinima(img, true, 1.0f, Float.MAX_VALUE, false, false, 0.001f);
     }
-	
-    public static Image localMaxima(Image img, boolean eight_connectivity) throws Exception
+
+    public static Image localMaxima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus, float plateau_epsilon) throws Exception
     {
     	int numBands = img.getNumBands();
 
@@ -190,16 +210,36 @@ public class ImgProc
     
         for(int b=0; b<numBands; b++)
         {
-            if(CLibrary.INSTANCE.vigra_localmaxima_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), eight_connectivity) != 0)
+            if(CLibrary.INSTANCE.vigra_localmaxima_c(img.getBand(b), img_out.getBand(b), img.getWidth(), img.getHeight(), eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, plateau_epsilon) != 0)
             {
                 throw new Exception("vigra_localmaxima_c failed!");
             }
         }
         return img_out;
 	}
+    public static Image localMaxima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border, boolean allow_plateaus) throws Exception
+    {
+    	return localMaxima(img, eight_connectivity, marker, threshold, allow_at_border, allow_plateaus, 0.001f);
+    }
+    public static Image localMaxima(Image img, boolean eight_connectivity, float marker, float threshold, boolean allow_at_border) throws Exception
+    {
+    	return localMaxima(img, eight_connectivity, marker, threshold, allow_at_border, false, 0.001f);
+    }
+    public static Image localMaxima(Image img, boolean eight_connectivity, float marker, float threshold) throws Exception
+    {
+    	return localMaxima(img, eight_connectivity, marker, threshold, false, false, 0.001f);
+    }
+    public static Image localMaxima(Image img, boolean eight_connectivity, float marker) throws Exception
+    {
+    	return localMaxima(img, eight_connectivity, marker, -Float.MAX_VALUE, false, false, 0.001f);
+    }
+    public static Image localMaxima(Image img, boolean eight_connectivity) throws Exception
+    {
+    	return localMaxima(img, eight_connectivity, 1.0f, -Float.MAX_VALUE, false, false, 0.001f);
+    }
     public static Image localMaxima(Image img) throws Exception
     {
-        return localMaxima(img, true);
+        return localMaxima(img, true, 1.0f, -Float.MAX_VALUE, false, false, 0.001f);
     }
 	
     	
